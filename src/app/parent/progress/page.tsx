@@ -1,0 +1,1 @@
+export default function Page() { return (<div className='p-8'><h1 className='text-2xl font-bold capitalize'>progress</h1><p className='text-muted-foreground mt-2'>Route: src/app/parent/progress</p></div>); }

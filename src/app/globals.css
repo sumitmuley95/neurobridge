@@ -1,0 +1,373 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   NeuroBridge Design System
+   A calm, predictable, low-clutter visual language built for neurodivergent
+   learners (dyslexia, ADHD, autism, Down syndrome) and their families.
+
+   Palette  — "Paper & Grove": warm paper background, soft ink text, muted
+              sage/harbor/clay/berry accents (no pure black/white, no
+              saturated neon).
+   Type     — Atkinson Hyperlegible (body) — designed by the Braille
+              Institute for maximum character-to-character distinction.
+              Lexend (headings) — designed to reduce cognitive load and
+              improve reading fluency.
+   Motion   — off by default for anyone who has asked for it; every
+              animation is short, purposeful, and non-looping.
+   ========================================================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-geist-mono);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Portal accent tokens — one muted hue per portal, used sparingly */
+  --color-student: var(--student);
+  --color-student-foreground: var(--student-foreground);
+  --color-student-soft: var(--student-soft);
+  --color-parent: var(--parent);
+  --color-parent-foreground: var(--parent-foreground);
+  --color-parent-soft: var(--parent-soft);
+  --color-teacher: var(--teacher);
+  --color-teacher-foreground: var(--teacher-foreground);
+  --color-teacher-soft: var(--teacher-soft);
+  --color-admin: var(--admin);
+  --color-admin-foreground: var(--admin-foreground);
+  --color-admin-soft: var(--admin-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+:root {
+  /* Paper & ink — warm, low-glare, never pure #000/#FFF */
+  --background: oklch(0.975 0.006 85);      /* #FAF7F1 warm paper */
+  --foreground: oklch(0.27 0.012 75);       /* #322E29 soft ink */
+
+  --card: oklch(0.995 0.003 85);            /* #FEFDFB */
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.995 0.003 85);
+  --popover-foreground: var(--foreground);
+
+  /* Sage — the one primary action color. Dark enough for AA text-on-fill. */
+  --primary: oklch(0.42 0.06 165);          /* #386653 */
+  --primary-foreground: oklch(0.99 0.004 165);
+
+  --secondary: oklch(0.94 0.01 85);         /* warm stone */
+  --secondary-foreground: oklch(0.3 0.015 75);
+
+  --muted: oklch(0.94 0.008 85);
+  --muted-foreground: oklch(0.46 0.014 70); /* meets 4.5:1 on paper */
+
+  --accent: oklch(0.92 0.025 165);          /* sage tint */
+  --accent-foreground: oklch(0.3 0.05 165);
+
+  --destructive: oklch(0.46 0.13 25);       /* muted brick red, not neon */
+  --destructive-foreground: oklch(0.99 0.004 25);
+
+  --border: oklch(0.89 0.01 80);
+  --input: oklch(0.89 0.01 80);
+  --ring: oklch(0.5 0.09 235);              /* harbor blue focus ring */
+
+  --chart-1: oklch(0.55 0.08 165);
+  --chart-2: oklch(0.55 0.09 235);
+  --chart-3: oklch(0.6 0.1 65);
+  --chart-4: oklch(0.52 0.08 305);
+  --chart-5: oklch(0.5 0.01 75);
+
+  --radius: 1rem;
+
+  --sidebar: oklch(0.96 0.007 85);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* Portal accents — each a distinct, muted hue at AA-safe depth */
+  --student: oklch(0.48 0.09 235);          /* harbor blue   #3E6E8E */
+  --student-foreground: oklch(0.99 0.004 235);
+  --student-soft: oklch(0.93 0.02 235);
+
+  --parent: oklch(0.5 0.07 165);            /* sage green    #4C7A67 */
+  --parent-foreground: oklch(0.99 0.004 165);
+  --parent-soft: oklch(0.93 0.02 165);
+
+  --teacher: oklch(0.46 0.09 305);          /* muted plum    #6E5496 */
+  --teacher-foreground: oklch(0.99 0.004 305);
+  --teacher-soft: oklch(0.93 0.02 305);
+
+  --admin: oklch(0.38 0.015 75);            /* deep warm slate, not black */
+  --admin-foreground: oklch(0.99 0.004 75);
+  --admin-soft: oklch(0.91 0.007 80);
+
+  --success: oklch(0.5 0.1 155);
+  --success-soft: oklch(0.93 0.03 155);
+  --warning: oklch(0.58 0.11 65);           /* muted clay/amber, not neon */
+  --warning-soft: oklch(0.93 0.035 70);
+}
+
+.dark {
+  --background: oklch(0.22 0.012 75);
+  --foreground: oklch(0.94 0.006 85);
+  --card: oklch(0.27 0.013 75);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.27 0.013 75);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.72 0.08 165);
+  --primary-foreground: oklch(0.18 0.02 165);
+  --secondary: oklch(0.32 0.014 75);
+  --secondary-foreground: oklch(0.94 0.006 85);
+  --muted: oklch(0.32 0.014 75);
+  --muted-foreground: oklch(0.74 0.012 80);
+  --accent: oklch(0.34 0.03 165);
+  --accent-foreground: oklch(0.92 0.02 165);
+  --destructive: oklch(0.68 0.13 25);
+  --destructive-foreground: oklch(0.16 0.02 25);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.7 0.09 235);
+  --sidebar: oklch(0.25 0.012 75);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: var(--ring);
+  --student: oklch(0.72 0.09 235);
+  --student-foreground: oklch(0.18 0.02 235);
+  --student-soft: oklch(0.32 0.03 235);
+  --parent: oklch(0.72 0.08 165);
+  --parent-foreground: oklch(0.18 0.02 165);
+  --parent-soft: oklch(0.32 0.03 165);
+  --teacher: oklch(0.72 0.08 305);
+  --teacher-foreground: oklch(0.18 0.02 305);
+  --teacher-soft: oklch(0.32 0.03 305);
+  --admin: oklch(0.82 0.008 80);
+  --admin-foreground: oklch(0.2 0.012 75);
+  --admin-soft: oklch(0.34 0.012 80);
+  --success: oklch(0.72 0.1 155);
+  --success-soft: oklch(0.3 0.04 155);
+  --warning: oklch(0.75 0.1 70);
+  --warning-soft: oklch(0.32 0.045 70);
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility toolbar states — applied as data-attributes on <html> by
+   AccessibilityProvider and persisted to localStorage. Every rule here is
+   additive on top of the base theme, never a separate second theme to
+   maintain.
+   -------------------------------------------------------------------------- */
+
+/* High contrast: deepen text, flatten muted colors, thicken borders */
+html[data-contrast="high"] {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.12 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0 0);
+  --muted-foreground: oklch(0.28 0 0);
+  --border: oklch(0.35 0 0);
+  --primary: oklch(0.3 0.06 165);
+  --ring: oklch(0.35 0.12 235);
+}
+html[data-contrast="high"] * {
+  border-color: var(--border);
+}
+
+/* Font scale: applied to the root, everything using rem scales with it */
+html[data-font-scale="lg"] { font-size: 112.5%; }   /* ~18px base */
+html[data-font-scale="xl"] { font-size: 125%; }      /* ~20px base */
+
+/* Manual "reduce motion" toggle, independent of OS setting */
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Reading guide ruler — a slim highlighted band that tracks the cursor to
+   help track a line of text. Positioned by AccessibilityProvider via a CSS
+   variable so no per-frame animation/transition is needed. */
+.reading-guide {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--reading-guide-y, 50%);
+  height: 2.75rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 40;
+  background: color-mix(in oklch, var(--warning-soft), transparent 25%);
+  border-top: 2px solid var(--warning);
+  border-bottom: 2px solid var(--warning);
+  mix-blend-mode: multiply;
+}
+.dark .reading-guide {
+  mix-blend-mode: normal;
+  opacity: 0.35;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.7;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+  }
+
+  p, li {
+    letter-spacing: 0.02em;
+    max-width: 68ch;
+  }
+
+  /* Never justify body copy — ragged-right is easier to track for
+     dyslexic readers than justified text with irregular word spacing. */
+  p, li, h1, h2, h3, h4, h5, h6 {
+    text-align: left;
+  }
+
+  /* Generous, uniform focus ring on every interactive element */
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+  }
+
+  /* Respect the OS-level reduced-motion preference by default, in addition
+     to the manual toolbar toggle above. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Comfortable reading measure for body copy blocks */
+  .text-measure {
+    max-width: 65ch;
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+  }
+
+  /* Guarantee the 48x48px minimum touch target even on visually smaller
+     controls, without changing their visible size. */
+  .tap-target {
+    position: relative;
+  }
+  .tap-target::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    width: max(100%, 48px);
+    height: max(100%, 48px);
+    transform: translate(-50%, -50%);
+  }
+}
+/* --------------------------------------------------------------------------
+   Landing page photo band — moves right → left in a seamless loop.
+   The track holds the photo list twice; shifting it by -50% lands exactly on
+   the second copy, so the loop has no jump. Pauses on hover/focus, and stops
+   for anyone who prefers reduced motion (OS setting or the toolbar toggle).
+   -------------------------------------------------------------------------- */
+@keyframes nb-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.nb-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: nb-marquee 45s linear infinite;
+}
+.nb-marquee:hover .nb-marquee-track,
+.nb-marquee:focus-within .nb-marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nb-marquee-track { animation: none; }
+}
+html[data-motion="reduced"] .nb-marquee-track { animation: none; }
+
+/* --------------------------------------------------------------------------
+   Learning path — gentle bob for the "START" bubble over the current lesson.
+   Stops automatically for reduced-motion users (OS or toolbar toggle).
+   -------------------------------------------------------------------------- */
+@keyframes nb-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, -5px); }
+}
+.nb-bob { animation: nb-bob 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .nb-bob { animation: none; } }
+html[data-motion="reduced"] .nb-bob { animation: none; }
+/* Path sways less on phones so labels never reach the screen edge */
+.nb-path-step { transform: translateX(calc(var(--x) * 0.55px)); }
+@media (min-width: 640px) { .nb-path-step { transform: translateX(calc(var(--x) * 1px)); } }
