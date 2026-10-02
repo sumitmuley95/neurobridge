@@ -1,5 +1,6 @@
 import { getDomainModules } from "@/app/actions/modules";
 import { getCurrentStudent } from "@/lib/auth-session";
+import { getStudentStats } from "@/lib/gamification";
 import { DuolingoPathView } from "@/components/student/DuolingoPathView";
 import Link from "next/link";
 
@@ -12,7 +13,12 @@ export default async function DomainLearningPage({
 }) {
   const { domain: domainId } = await params;
   const currentStudent = await getCurrentStudent();
-  const { domain, modules, allCompleted } = await getDomainModules(domainId, currentStudent.id);
+  
+  // Fetch modules and stats in parallel
+  const [{ domain, modules, allCompleted }, stats] = await Promise.all([
+    getDomainModules(domainId, currentStudent.id),
+    getStudentStats(currentStudent.id),
+  ]);
 
   if (!domain || !modules || modules.length === 0) {
     return (
@@ -37,6 +43,8 @@ export default async function DomainLearningPage({
       initialModules={modules as any}
       studentId={currentStudent.id}
       initialAllCompleted={allCompleted}
+      streak={stats.currentStreak}  // Pass real streak
+      totalXp={stats.xp}             // Pass real total XP
     />
   );
 }

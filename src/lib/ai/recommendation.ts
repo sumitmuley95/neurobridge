@@ -134,7 +134,7 @@ export async function getPersonalizedRecommendation(
 
     return fallbackResult;
   } catch (error) {
-    console.error("Gemini Recommendation Error:", error);
+    console.warn("AI recommendation failed, falling back to default activity:", error);
     return fallbackResult;
   }
 }

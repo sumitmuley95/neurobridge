@@ -83,9 +83,8 @@ export default async function TeacherDashboardPage() {
                   </span>
                 </div>
                 <p className="text-sm text-slate-500 font-medium">
-                  Parent: <span className="text-slate-800">{student.profiles?.full_name || "Anita Sharma"}</span>
+                  Parent: <span className="text-slate-800">{student.profiles?.full_name || "Not linked yet"}</span>
                 </p>
-                <p className="text-xs text-slate-400 mt-1">Access PIN: {student.access_pin}</p>
 
                 {stats[student.id] && (
                   <div className="mt-4 space-y-2">

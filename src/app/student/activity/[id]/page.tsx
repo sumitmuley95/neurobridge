@@ -25,7 +25,6 @@ interface ActivityData {
   helper_audio_text: string;
   visual_cue: string;
   options: { id: string; text: string; emoji: string }[];
-  correct_answer: string;
   hint: string;
   domains?: { name: string };
 }
@@ -49,7 +48,7 @@ export default function ActivityPlayerPage() {
     async function load() {
       if (!activityId) return;
       const data = await getActivityById(activityId);
-      setActivity(data);
+      setActivity(data as unknown as ActivityData | null);
       setLoading(false);
       startTimeRef.current = Date.now();
     }
@@ -61,24 +60,21 @@ export default function ActivityPlayerPage() {
     setPromptingLevel(1);
   };
 
-  const handleCheckAnswer = async () => {
+    const handleCheckAnswer = async () => {
     if (!selectedOption || !activity) return;
+    setIsSubmitting(true);
+    const elapsedSeconds = (Date.now() - startTimeRef.current) / 1000;
+    const res = await submitActivityAttempt({
+      activityId: activity.id,
+      selectedOption,
+      attemptsCount,
+      promptingLevel,
+      responseTimeSeconds: Number(elapsedSeconds.toFixed(2)),
+    });
+    setIsSubmitting(false);
 
-    const isCorrect = selectedOption === activity.correct_answer;
-
-    if (isCorrect) {
+    if (res.success && res.isCorrect) {
       setFeedback("correct");
-      setIsSubmitting(true);
-      const elapsedSeconds = (Date.now() - startTimeRef.current) / 1000;
-      await submitActivityAttempt({
-        activityId: activity.id,
-        skillId: activity.skill_id,
-        isCorrect: true,
-        attemptsCount: attemptsCount,
-        promptingLevel: promptingLevel,
-        responseTimeSeconds: Number(elapsedSeconds.toFixed(2)),
-      });
-      setIsSubmitting(false);
     } else {
       setFeedback("incorrect");
       setAttemptsCount((prev) => prev + 1);

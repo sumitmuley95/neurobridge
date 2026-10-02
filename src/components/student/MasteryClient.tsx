@@ -1,78 +1,90 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { 
-  CheckCircle2, 
-  ArrowRight, 
-  RotateCcw, 
-  Award, 
-  AlertTriangle,
-  Loader2,
-  Sparkles,
-  ArrowLeft
-} from "lucide-react";
+import { CheckCircle2, ArrowRight, RotateCcw, Award, Lightbulb, Loader2, ArrowLeft } from "lucide-react";
 import type { MasteryQuestion } from "@/lib/data/mastery-questions";
-import { submitUnitMasteryCheck } from "@/app/actions/mastery";
+import { submitUnitMasteryCheck, type MasteryResult } from "@/app/actions/mastery";
 import { SpeakButton, questionWithChoices } from "@/components/student/SpeakButton";
 
 export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
   const params = useParams();
-  const router = useRouter();
   const domainId = params.domain as string;
-
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<{ isCorrect: boolean }[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]); // chosen option ids, in order
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<{
-    passed: boolean;
-    scorePercentage: number;
-    correctCount: number;
-    totalQuestions: number;
-  } | null>(null);
+  const [result, setResult] = useState<MasteryResult | null>(null);
+  const [error, setError] = useState("");
 
   const currentQ = questions[currentIndex];
   const progressPercent = ((currentIndex + 1) / questions.length) * 100;
 
+  const restart = () => {
+    setCurrentIndex(0);
+    setSelectedOption(null);
+    setAnswers([]);
+    setResult(null);
+    setError("");
+  };
+
   const handleNext = async () => {
     if (!selectedOption) return;
-    const isCorrect = selectedOption === currentQ.correctAnswer;
-    const updatedAnswers = [...answers, { isCorrect }];
-
+    const updatedAnswers = [...answers, selectedOption];
     setAnswers(updatedAnswers);
     setSelectedOption(null);
 
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex(currentIndex + 1);
-    } else {
-      // Quiz complete -> submit score
-      setIsSubmitting(true);
-      const correctCount = updatedAnswers.filter((a) => a.isCorrect).length;
-      const res = await submitUnitMasteryCheck(domainId, questions.length, correctCount);
-      setResult(res);
-      setIsSubmitting(false);
+      return;
     }
+
+    // Quiz complete: the server grades the answers
+    setIsSubmitting(true);
+    const res = await submitUnitMasteryCheck(domainId, updatedAnswers);
+    setIsSubmitting(false);
+    if (res.error) {
+      setError(res.error);
+      return;
+    }
+    setResult(res);
   };
+
+  // ERROR SCREEN
+  if (error) {
+    return (
+      <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 border-2 border-slate-100 shadow-sm text-center space-y-4">
+        <h1 className="text-2xl font-black text-slate-900">Something went wrong</h1>
+        <p className="text-sm text-slate-600" role="alert">{error}</p>
+        <button
+          type="button"
+          onClick={restart}
+          className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 min-h-12 rounded-2xl"
+        >
+          <RotateCcw className="w-4 h-4" aria-hidden="true" /> Try the check again
+        </button>
+      </div>
+    );
+  }
 
   // PASS SCREEN
   if (result && result.passed) {
     return (
       <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 sm:p-10 border-2 border-emerald-100 shadow-xl text-center space-y-6">
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-          <Award className="w-10 h-10" />
+          <Award className="w-10 h-10" aria-hidden="true" />
         </div>
         <div className="space-y-2">
           <span className="text-xs font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 inline-block">
             Mastery Verified 🏆
           </span>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900">
-            Unit Passed! 🎉
-          </h1>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900">Unit Passed! 🎉</h1>
           <p className="text-slate-600 text-sm max-w-sm mx-auto">
-            You scored <span className="font-extrabold text-emerald-600">{result.scorePercentage}%</span> ({result.correctCount}/{result.totalQuestions} correct). This unit has been marked as <span className="font-extrabold text-purple-700">Mastered</span>!
+            You scored <span className="font-extrabold text-emerald-600">{result.scorePercentage}%</span> (
+            {result.correctCount}/{result.totalQuestions} correct). This unit is now marked as{" "}
+            <span className="font-extrabold text-purple-700">Mastered</span>!
           </p>
         </div>
 
@@ -94,37 +106,43 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
     );
   }
 
-  // FAIL SCREEN (Reset Path Enforced)
+  // NOT YET PASSED SCREEN (progress is kept)
   if (result && !result.passed) {
     return (
       <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 sm:p-10 border-2 border-amber-100 shadow-xl text-center space-y-6">
         <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-          <RotateCcw className="w-10 h-10" />
+          <RotateCcw className="w-10 h-10" aria-hidden="true" />
         </div>
         <div className="space-y-2">
           <span className="text-xs font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 inline-block">
-            Practice Needed
+            Almost there
           </span>
-          <h1 className="text-3xl font-black text-slate-900">
-            Let's Try Again! 💪
-          </h1>
+          <h1 className="text-3xl font-black text-slate-900">Let&apos;s Try Again! 💪</h1>
           <p className="text-slate-600 text-sm max-w-sm mx-auto">
-            You scored <span className="font-bold text-amber-600">{result.scorePercentage}%</span>. A passing score of 70% is required. Your 5 video lessons have been reset so you can review.
+            You scored <span className="font-bold text-amber-600">{result.scorePercentage}%</span> (
+            {result.correctCount}/{result.totalQuestions} correct). You need 70% to pass this unit.
           </p>
         </div>
 
-        <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs font-semibold text-amber-900 text-left flex items-start gap-2.5">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-          <span>Don't worry! Watch the 5 video lessons again sequentially to prepare for your next attempt.</span>
+        <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-sm font-semibold text-amber-900 text-left flex items-start gap-2.5">
+          <Lightbulb className="w-5 h-5 text-amber-600 shrink-0" aria-hidden="true" />
+          <span>Your lessons and badges are safe. Watch the lessons again whenever you like, then try the check when you feel ready.</span>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-2 flex flex-col sm:flex-row gap-3">
           <Link
             href={`/student/learning/${domainId}`}
-            className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-black px-8 py-4 rounded-2xl shadow-md transition-all text-base w-full active:scale-95"
+            className="flex-1 inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-black px-6 py-4 rounded-2xl shadow-md transition-all text-base active:scale-95"
           >
-            <RotateCcw className="w-5 h-5" /> Restart Video Lessons (Lesson 1)
+            Review the lessons
           </Link>
+          <button
+            type="button"
+            onClick={restart}
+            className="flex-1 inline-flex items-center justify-center gap-2 border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold px-6 py-4 rounded-2xl transition-all"
+          >
+            <RotateCcw className="w-4 h-4" aria-hidden="true" /> Try again now
+          </button>
         </div>
       </div>
     );
@@ -136,9 +154,9 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
       <div className="flex items-center justify-between">
         <Link
           href={`/student/learning/${domainId}`}
-          className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-500 hover:text-slate-800"
+          className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-500 hover:text-slate-800 min-h-11"
         >
-          <ArrowLeft className="w-4 h-4" /> Exit Test
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Exit Test
         </Link>
         <span className="text-xs font-black uppercase tracking-widest bg-purple-100 text-purple-800 px-3 py-1 rounded-xl">
           Unit Mastery Check
@@ -148,14 +166,20 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
-          <span>Question {currentIndex + 1} of {questions.length}</span>
+          <span>
+            Question {currentIndex + 1} of {questions.length}
+          </span>
           <span>{Math.round(progressPercent)}%</span>
         </div>
-        <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-          <div
-            className="bg-purple-600 h-full transition-all duration-300 rounded-full"
-            style={{ width: `${progressPercent}%` }}
-          />
+        <div
+          className="w-full bg-slate-200 h-3 rounded-full overflow-hidden"
+          role="progressbar"
+          aria-valuenow={Math.round(progressPercent)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Quiz progress"
+        >
+          <div className="bg-purple-600 h-full transition-all duration-300 rounded-full" style={{ width: `${progressPercent}%` }} />
         </div>
       </div>
 
@@ -164,9 +188,7 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">Assessment Question</span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug mt-1">
-              {currentQ.prompt}
-            </h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug mt-1">{currentQ.prompt}</h1>
           </div>
           <SpeakButton
             label="Listen to question"
@@ -179,27 +201,29 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
           />
         </div>
 
-        {/* Render High Quality PDF Image with Emoji Fallback */}
+        {/* Picture with emoji fallback */}
         <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center justify-center text-center space-y-3">
           {currentQ.imageSrc ? (
             <div className="relative w-full max-w-md h-56 sm:h-64 rounded-xl overflow-hidden shadow-sm bg-white border border-slate-200 flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentQ.imageSrc}
                 alt={currentQ.prompt}
                 className="w-full h-full object-contain p-2"
                 onError={(e) => {
-                  // Fallback to emoji if image file is not yet placed
                   e.currentTarget.style.display = "none";
                   const fallbackEl = e.currentTarget.parentElement?.querySelector(".fallback-emoji");
                   if (fallbackEl) (fallbackEl as HTMLElement).style.display = "block";
                 }}
               />
-              <div className="fallback-emoji text-6xl hidden">
+              <div className="fallback-emoji text-6xl hidden" aria-hidden="true">
                 {currentQ.visualEmoji || "❓"}
               </div>
             </div>
           ) : (
-            <div className="text-6xl">{currentQ.visualEmoji}</div>
+            <div className="text-6xl" aria-hidden="true">
+              {currentQ.visualEmoji}
+            </div>
           )}
 
           {currentQ.subText && (
@@ -216,7 +240,9 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
             return (
               <button
                 key={option.id}
+                type="button"
                 onClick={() => setSelectedOption(option.id)}
+                aria-pressed={isSelected}
                 className={`w-full p-4 rounded-2xl border-2 text-left font-bold text-lg flex items-center justify-between transition-all ${
                   isSelected
                     ? "border-purple-600 bg-purple-50 text-purple-950 shadow-sm"
@@ -224,16 +250,17 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{option.emoji}</span>
+                  <span className="text-2xl" aria-hidden="true">{option.emoji}</span>
                   <span>{option.text}</span>
                 </div>
-                {isSelected && <CheckCircle2 className="w-6 h-6 text-purple-600" />}
+                {isSelected && <CheckCircle2 className="w-6 h-6 text-purple-600" aria-hidden="true" />}
               </button>
             );
           })}
         </div>
 
         <button
+          type="button"
           onClick={handleNext}
           disabled={!selectedOption || isSubmitting}
           className={`w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all ${
@@ -244,12 +271,12 @@ export function MasteryClient({ questions }: { questions: MasteryQuestion[] }) {
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" /> Evaluating Score...
+              <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> Checking your answers...
             </>
           ) : (
             <>
               {currentIndex + 1 === questions.length ? "Submit Mastery Check" : "Next Question"}
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </>
           )}
         </button>

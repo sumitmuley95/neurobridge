@@ -5,8 +5,10 @@ import { canSeeDomain, getMasteryQuestions } from "@/lib/curriculum";
 import { MasteryClient } from "@/components/student/MasteryClient";
 import type { MasteryQuestion } from "@/lib/data/mastery-questions";
 
-// Mastery questions now come from the database: the school's own questions
-// for this subject if it has set them, otherwise the default questions.
+export const dynamic = "force-dynamic";
+
+// Questions come from the database: the school's own set for this subject if it
+// has one, otherwise the defaults. Correct answers stay on the server.
 export default async function UnitMasteryPage({ params }: { params: Promise<{ domain: string }> }) {
   const { domain: domainId } = await params;
   const student = await getCurrentStudent();
@@ -25,15 +27,18 @@ export default async function UnitMasteryPage({ params }: { params: Promise<{ do
     visualEmoji: q.visual_emoji ?? undefined,
     subText: q.sub_text ?? undefined,
     options: q.options,
-    correctAnswer: q.correct_answer,
   }));
 
   if (questions.length === 0) {
     return (
       <div className="max-w-md mx-auto bg-card border-2 border-border rounded-3xl p-8 space-y-3">
         <h1 className="text-xl font-bold font-heading">No mastery check yet</h1>
-        <p className="text-sm text-muted-foreground">This unit doesn&apos;t have quiz questions yet. Please ask your school admin.</p>
-        <Link href={`/student/learning/${domainId}`} className="inline-flex min-h-11 items-center font-semibold text-student">Back to the unit</Link>
+        <p className="text-sm text-muted-foreground">
+          This unit doesn&apos;t have quiz questions yet. Please ask your school admin.
+        </p>
+        <Link href={`/student/learning/${domainId}`} className="inline-flex min-h-11 items-center font-semibold text-student">
+          Back to the unit
+        </Link>
       </div>
     );
   }

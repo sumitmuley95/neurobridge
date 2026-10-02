@@ -70,8 +70,12 @@ export function DuolingoPathView({
   const handleFinishLesson = async () => {
     if (!activeModule) return;
     setCompleting(true);
-    await completeVideoModule(activeModule.id, studentId, domain.id);
-
+    const res = await completeVideoModule(activeModule.id, studentId, domain.id);
+    if (!res.success) {
+      setCompleting(false);
+      alert(res.error || "Could not save this lesson. Please try again.");
+      return;
+    }
     const updated = modules.map((m) => {
       if (m.id === activeModule.id) return { ...m, status: "completed" as const };
       if (m.order_index === activeModule.order_index + 1 && m.status === "locked")

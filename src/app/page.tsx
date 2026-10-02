@@ -55,12 +55,12 @@ const STEPS = [
 
 // Placeholder partner schools — replace with real partners when available.
 const SCHOOLS = [
-  { name: "Asha Learning Centre", city: "Kolhapur" },
-  { name: "Prerna Special School", city: "Pune" },
-  { name: "Umang Inclusive Academy", city: "Sangli" },
-  { name: "Sparsh Vocational Institute", city: "Satara" },
-  { name: "Navjeevan School for Special Needs", city: "Mumbai" },
-  { name: "Saksham Learning Hub", city: "Nashik" },
+  { name: "Asha Learning Centre - DEMO", city: "Kolhapur" },
+  { name: "Prerna Special School - DEMO", city: "Pune" },
+  { name: "Umang Inclusive Academy - DEMO", city: "Sangli" },
+  { name: "Sparsh Vocational Institute - DEMO", city: "Satara" },
+  { name: "Navjeevan School for Special Needs - DEMO", city: "Mumbai" },
+  { name: "Saksham Learning Hub - DEMO", city: "Nashik" },
 ];
 
 const PHONE = "+91 8669391467";

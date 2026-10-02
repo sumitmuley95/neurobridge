@@ -1,1 +1,0 @@
-export default function Page() { return (<div className='p-8'><h1 className='text-2xl font-bold capitalize'>activities</h1><p className='text-muted-foreground mt-2'>Route: src/app/teacher/activities</p></div>); }

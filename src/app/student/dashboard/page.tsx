@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function StudentDashboardPage() {
   const currentStudent = await getCurrentStudent();
   const [{ allDomains, recommendedActivity, aiMeta }, stats] = await Promise.all([
-    getStudentLearningPath(currentStudent.id),
+    getStudentLearningPath(),
     getStudentStats(currentStudent.id),
   ]);
 

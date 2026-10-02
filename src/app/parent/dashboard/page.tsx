@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function ParentDashboardPage() {
   const currentParent = await getCurrentParent();
   const [{ student, domainResults, observations }, stats] = await Promise.all([
-    getParentDashboardData(currentParent.studentId),
+    getParentDashboardData(),
     getStudentStats(currentParent.studentId),
   ]);
   const childName = student?.full_name || currentParent.studentName;
